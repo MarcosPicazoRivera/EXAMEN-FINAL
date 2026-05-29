@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout del código
-        uses: actions/checkout@8a436940a019485749f1db12df380e28f3bbdcbf
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
 
       - name: Validar tests
         run: |
@@ -28,7 +28,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout del código
-        uses: actions/checkout@8a436940a019485749f1db12df380e28f3bbdcbf
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
 
       - name: Desplegar en Staging
         run: |
@@ -44,7 +44,7 @@ jobs:
       id-token: write
     steps:
       - name: Checkout del código
-        uses: actions/checkout@8a436940a019485749f1db12df380e28f3bbdcbf
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
 
       - name: Desplegar en Producción
         run: |
