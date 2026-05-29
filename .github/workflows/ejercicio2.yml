@@ -1,0 +1,52 @@
+name: Enterprise Security Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build_y_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@8a436940a019485749f1db12df380e28f3bbdcbf
+
+      - name: Validar tests
+        run: |
+          echo "Construyendo aplicación..."
+          echo "Ejecutando tests de seguridad..."
+          echo "Tests pasados correctamente."
+
+  despliegue_staging:
+    needs: build_y_test
+    runs-on: ubuntu-latest
+    environment: staging
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@8a436940a019485749f1db12df380e28f3bbdcbf
+
+      - name: Desplegar en Staging
+        run: |
+          echo "Desplegando con variable pública: ${{ vars.NON_SENSITIVE_VAR }}"
+          echo "Usando secreto: ${{ secrets.API_SECRET }}"
+
+  despliegue_produccion:
+    needs: despliegue_staging
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@8a436940a019485749f1db12df380e28f3bbdcbf
+
+      - name: Desplegar en Producción
+        run: |
+          echo "Desplegando en Producción de forma segura."
+          echo "Utilizando secreto de despliegue desde el scope de environment."
