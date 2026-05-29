@@ -16,7 +16,7 @@ jobs:
 
       - name: Validar tests
         run: |
-          echo "Construyendo aplicación..."
+          echo "Construyendo aplicación.."
           echo "Ejecutando tests de seguridad..."
           echo "Tests pasados correctamente."
 
