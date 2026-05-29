@@ -45,12 +45,13 @@ jobs:
         uses: actions/setup-node@v4.0.1
         with:
           node-version: ${{ matrix.node }}
-          cache: 'npm'
 
-      - name: Configurar Node ${{ matrix.node }}
-        uses: actions/setup-node@v4.0.1
-        with:
-          node-version: ${{ matrix.node }}
+      - name: Simular validaciones y tests
+        shell: bash
+        run: |
+          echo "Ejecutando en modo ${{ matrix.mode }}..."
+          mkdir -p build_output
+          echo "Resultado exitoso" > build_output/result.txt
 
       - name: Generar Job Summary
         shell: bash 
