@@ -1,52 +1,68 @@
-name: Enterprise Security Pipeline
+name: Enterprise Matrix Pipeline
 
 on:
   push:
+    branches: [ "main" ]
+  pull_request:
     branches: [ "main" ]
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build_y_test:
-    runs-on: ubuntu-latest
+  build:
+    name: Build ${{ matrix.os }} - Node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: ['18.x', '20.x']
+        mode: [debug, release]
+        
+        exclude:
+          - os: windows-latest
+            node: '18.x'
+            mode: debug
+            
+        include:
+          - os: ubuntu-latest
+            node: '20.x'
+            mode: release
+            environment: production
+            extra_var: 'SUPER_SECRET'
+
     steps:
       - name: Checkout del código
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+        uses: actions/checkout@v4.1.1
 
-      - name: Validar tests
+      - name: Configurar Node ${{ matrix.node }}
+        uses: actions/setup-node@v4.0.1
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'npm'
+
+      - name: Configurar Node ${{ matrix.node }}
+        uses: actions/setup-node@v4.0.1
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Generar Job Summary
+        shell: bash 
         run: |
-          echo "Construyendo aplicación.."
-          echo "Ejecutando tests de seguridad..."
-          echo "Tests pasados correctamente."
+          echo "### Resumen de Ejecución Enterprise" >> $GITHUB_STEP_SUMMARY
+          echo "- SO: ${{ matrix.os }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Node: ${{ matrix.node }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Modo: ${{ matrix.mode }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Entorno: ${{ matrix.environment || 'development' }}" >> $GITHUB_STEP_SUMMARY
 
-  despliegue_staging:
-    needs: build_y_test
-    runs-on: ubuntu-latest
-    environment: staging
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout del código
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
-
-      - name: Desplegar en Staging
-        run: |
-          echo "Desplegando con variable pública: ${{ vars.NON_SENSITIVE_VAR }}"
-          echo "Usando secreto: ${{ secrets.API_SECRET }}"
-
-  despliegue_produccion:
-    needs: despliegue_staging
-    runs-on: ubuntu-latest
-    environment: production
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - name: Checkout del código
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
-
-      - name: Desplegar en Producción
-        run: |
-          echo "Desplegando en Producción de forma segura."
-          echo "Utilizando secreto de despliegue desde el scope de environment."
+      - name: Subir Artifacts
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: reporte-${{ matrix.os }}-${{ matrix.node }}-${{ matrix.mode }}
+          path: build_output/
