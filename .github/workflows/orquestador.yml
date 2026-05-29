@@ -34,6 +34,8 @@ jobs:
               - 'backend/**'
             infra:
               - 'infrastructure/**'
+            docs:
+              -'docs/**'
 
   frontend-pipeline:
     needs: detect-changes
@@ -44,3 +46,8 @@ jobs:
     needs: detect-changes
     if: ${{ needs.detect-changes.outputs.backend == 'true' }}
     uses: ./.github/workflows/reusable-backend.yml
+
+  infra-pipeline:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.infra == 'true' }}
+    uses: ./.github/workflows/reusable-infra.yml
