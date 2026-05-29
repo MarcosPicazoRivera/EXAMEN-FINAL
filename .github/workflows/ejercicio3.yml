@@ -57,7 +57,7 @@ jobs:
       - name: Generar Job Summary
         shell: bash 
         run: |
-          echo "### Resumen de Ejecución Enterprise" >> $GITHUB_STEP_SUMMARY
+          echo "### Resumen de Ejecución Enterprise." >> $GITHUB_STEP_SUMMARY
           echo "- SO: ${{ matrix.os }}" >> $GITHUB_STEP_SUMMARY
           echo "- Node: ${{ matrix.node }}" >> $GITHUB_STEP_SUMMARY
           echo "- Modo: ${{ matrix.mode }}" >> $GITHUB_STEP_SUMMARY
